@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>船队监控</title>
+<style type="text/css"> 
+<!--
+html,body { 
+	height:100%;
+	width:100%;
+	margin:0;
+	padding:0;
+}
+-->
+</style>
+
+<script src="http://api.shipxy.com/sp.dll?key=GZEPORTD96C74315EBEC1202AA830813&ver=1.0" language="javascript" charset="gb2312">  
+</script> 
+<!-- <script src="http://api.shipfinder.com/sp.dll?key=SFGROUP1997B393D98E4BEB12460FC32&ver=1.1"></script>-->
+<script> 
+var seaMap1;
+ window.onload = function () {
+        //调用示例
+	
+      seaMap1 = new SeaMap("mapDiv");
+       
+ }	    
+
+
+
+
+function mapReady() {
+		//alert("地图初始化完毕"); //只有地图初始化完毕后，SeaMap其他接口方法才能使用。
+		seaMap1.setDefaultShipInforWindowAvailable(true);
+		//注册船舶点击事件的监听，shipClickHandler是监听事件的处理函数
+		seaMap1.addShipClickEventListener("shipClickHandler");
+	}
+
+	/*
+	显示船舶列表
+	kw: 关键字
+	page: 当前页
+	 */
+	function fsearch(keyWords, pageIndex) {
+		//每页显示数据条数
+		var pageSize = 10;
+
+		//搜索的数据类型  
+		//0、所有 1、船名 2、呼号 3、IMO编号 4、MMSI 
+		var type = 0;
+
+		//构造参数
+		var option = {
+			pageIndex : pageIndex || 1,
+			pageSize : pageSize,
+			type : type
+		};
+
+		//根据关键字并指定匹配类型（船名/呼号/IMO/MMSI/全部匹配）模糊查询正在港的船舶数据。可以通过该接口获取到船舶唯一标识号。
+		seaMap1.searchShip(keyWords || "", "searchShipResult", option);
+	}
+
+	function searchShipResult(r) {
+		var a, b, c, s = '', kw = document.getElementById('txtKey').value;
+		if (r && r.status == 0) {
+			a = r.data || [];
+			for ( var i = 0; i < a.length; i++) {
+				if (i == 10)
+					break;
+				c = a[i];
+				//船舶定位
+				s += '<a href="javascript:void(seaMap1.locateShip('
+						+ r.oid[i]
+						+ ',\'locateShipResult\'))" class="engFonts"><br/>'
+						+ c + '</a>';
+			}
+		}
+		document.getElementById('seamap_content').innerHTML = s || '没有数据';
+	}
+
+	function locateShipResult(data) {
+		if (!(data && data.status == 0)) {
+			alert('定位船舶失败');
+		}
+	}
+
+
+function Hide(){
+	document.getElementById('legendContent').style.display="none";
+}
+
+function Showlegend(){
+document.getElementById('legendContent').style.display="";
+
+} 
+</script>
+</head>
+ 
+<body>
+   <div id="headerContent">
+            
+     <!--船舶符号-->
+    <div id="legendContent" style="z-index: 2999; position: absolute; width: 200px; overflow: hidden;">
+        <div  id="legendBox">
+            <ul>
+                <li style="border-top: none;"><b>颜色</b></li>
+                <li>
+                   <img src="images/Screenshots/redShip.gif" />我的船队
+                </li>
+                <li>
+                  <img src="images/Screenshots/purpleShip.gif" />定制的船
+                </li>
+                <li>
+                <img src="images/Screenshots/yellowShip.gif" />迟延<span > <30</span>分钟
+                </li>
+                <li>
+                <img src="images/Screenshots/greenShip.gif" />
+                <span>30</span>分钟<span>≤</span>迟延<span>≤2</span>小时
+                </li>
+                <li>
+                 <img src="images/Screenshots/grayShip.gif" />迟延<span >>2</span>小时
+                </li>
+                <li class="symbolSty"><b>形状</b></li>
+                <li>
+              	 <img src="images/Screenshots/yellowShip.gif" /><font color="blue"> 静止</font>
+                </li>
+                <li style="height: 30px;">
+                <img src="images/Screenshots/navigation.gif" /> <font style="line-height: 30px;" color="blue"> 航行</font>
+                </li>
+                <li style="height: 30px;">
+                   <img src="images/Screenshots/turn.gif" />
+                    <font style="line-height: 30px;" color="blue"> 航行且转向</font>
+                </li>
+                <li class="symbolSty"><b>标注</b></li>
+                <li style="height: 45px;">
+                 <img src="images/Screenshots/aisymbol.gif" />
+                    <font style="line-height: 17px;" color="red"> <span >AIS</span>船位</font>
+                </li>
+                <li style="height: 45px;">
+                  <img src="images/Screenshots/dplusymbol.gif" />
+                    <font style="line-height: 17px;" color="red"><span>D+</span>船位</font>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    </div>
+
+
+ <table width="85%" id="actlist" align="right">
+ 
+<!-- 	<tr style="height: 70px" bgcolor="#E6E6FA">-->
+<!-- 	<td colspan="2" ></td></tr>-->
+
+	<tr style="height: 20px; background-color: rgb(108, 183, 251);">
+<!--			<td><input type= "text"  style="width: 180px;" name= "querystr" id="querystr"  ></td>-->
+ 
+	<td> <div >
+             <span >船名</span> <span >呼号</span> <span >MMSI</span> <span >IMO</span> <span>船舶符号</span>
+<!--             <a href="javascript:void(0);" id="mouselegend" onmouseover="Showlegend()" onmouseout="Hide()" >船舶符号</a>-->
+         </div>
+    </td>
+	<td align="left">
+<!--	<a href="#" onclick="getDataFromServer()">Search</a>--> 
+<input name="txtKey" type="text" id="txtKey" maxlength="20"   style="outline: none;" />
+ <input type="button"  value="搜索" onclick="fsearch(document.getElementById('txtKey').value, 1);document.getElementById('txtKey').focus();return false"></input>
+	</td>
+	</tr>
+	
+	<tr><td valign="top"></td><td valign="top"></td></tr>
+	<tr style="width: 842px" bgcolor="#E6E6FA">
+		<td valign="top" id="seamap_content"  style="width: 21%">
+		
+		</td>
+
+		<td valign="top">
+<!--			<div  style="width: 100%; background-color: rgb(192, 192, 192);"></div>-->
+<!--			<div  style="width: 100%; height: 6px; background-color: rgb(108, 183, 251);"></div>-->
+			<div id="mapDiv" style="width: 100%; height: 500px"></div>
+		</td>
+	</tr>
+
+	<tr><td>
+		</td>
+	<td ></td></tr>
+ 	
+ 	<tr style="background-color: rgb(192, 192, 192); height: 30px" align="center"><td colspan="2" > <br></td></tr>
+ </table>
+   </body>  
+</html>  

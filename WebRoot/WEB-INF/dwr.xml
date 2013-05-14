@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" 
+"http://getahead.org/dwr/dwr20.dtd"> 
+<dwr>
+<!-- AJAX技术具体实现 -->
+    <allow>
+
+	<!-- 业务处理类  交给spring-->
+	<create creator="spring"  javascript="dwrCarService" scope="application">
+		 <param name="beanName" value="dwrCarService"/> 
+	</create>
+
+	<create creator="spring" javascript="dwrGpsHelper" scope="application">
+		 <param name="beanName" value="dwrGpsHelper"/> 
+	</create>
+	
+	<!--     convert将bean的集合变成javascript中的对象数组-->
+	<convert converter="bean" match="com.gzeport.app.gps.pojo.VehicleInfo">
+		<param name="include" value="alarm,dir,eff,getMode,gpsSpeed,gpstime,height,lat,lon,mile,plate,protocol,provider,recvtime,
+									run,speed,statusChars,tagChar,vehicleId,VTKey,platecolor"/>
+	</convert>  
+	
+	<convert converter="bean" match="com.gzeport.app.gps.pojo.CarNo">
+		<param name="include" value="id,plate"/>
+	</convert>  
+   </allow>
+    <signatures>       
+	   <![CDATA[             
+	   import java.util.List;        
+	   import java.util.Map;           
+	   import com.gzeport.app.gps.dwr.controller.DwrCarService;      
+	   DwrCarService.getGpsPolylineData(Map<String,String> data);      
+	     ]]>
+	</signatures>
+</dwr>
